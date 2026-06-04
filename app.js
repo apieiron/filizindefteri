@@ -8,6 +8,7 @@ let filteredStories = [];
 let currentStoryId = null;
 let activeTag = null;
 let activeSearch = '';
+let activeSourceFilter = 'all'; // 'all', 'defter', 'ekmekvegul'
 
 // Preferences State (with defaults or LocalStorage)
 let appTheme = localStorage.getItem('filizindefteri-theme') || localStorage.getItem('moladayim-theme') || 'mola';
@@ -29,6 +30,11 @@ const welcomeContainer = document.getElementById('welcomeContainer');
 const storyFullView = document.getElementById('storyFullView');
 const homeLink = document.getElementById('homeLink');
 
+// Filter Tab DOM Elements
+const tabAll = document.getElementById('tabAll');
+const tabDefter = document.getElementById('tabDefter');
+const tabEkmekveGul = document.getElementById('tabEkmekveGul');
+
 // Font Adjusters
 const btnFontSizeDecrease = document.getElementById('fontSizeDecrease');
 const btnFontSizeIncrease = document.getElementById('fontSizeIncrease');
@@ -44,20 +50,43 @@ document.addEventListener('DOMContentLoaded', () => {
   // Apply saved settings
   applyTheme(appTheme);
   
-  // Fetch stories
-  fetch('stories.json')
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Stories JSON could not be loaded');
-      }
-      return response.json();
-    })
-    .then(data => {
-      allStories = data.map(story => {
-        // Pre-normalize tags for clean presentation
-        story.normalizedTags = normalizeTags(story.tags);
-        return story;
-      });
+  // Fetch both local and scraped stories
+  Promise.all([
+    fetch('stories.json')
+      .then(response => response.ok ? response.json() : [])
+      .catch(err => {
+        console.error('Error fetching stories.json:', err);
+        return [];
+      }),
+    fetch('ekmekvegul_stories.json')
+      .then(response => response.ok ? response.json() : [])
+      .catch(err => {
+        console.error('Error fetching ekmekvegul_stories.json:', err);
+        return [];
+      })
+  ])
+    .then(([localData, ekmekvegulData]) => {
+      // Process local stories
+      const processedLocal = localData
+        .filter(story => story.visible !== 0)
+        .map(story => {
+          story.normalizedTags = normalizeTags(story.tags);
+          story.source = 'defter';
+          return story;
+        });
+
+      // Process Ekmek ve Gül stories
+      const processedEG = ekmekvegulData
+        .filter(story => story.visible !== 0)
+        .map(story => {
+          story.normalizedTags = normalizeTags(story.tags);
+          story.source = 'ekmekvegul';
+          return story;
+        });
+
+      // Combine and sort by date descending
+      allStories = [...processedLocal, ...processedEG];
+      allStories.sort((a, b) => b.date.localeCompare(a.date));
       
       filteredStories = [...allStories];
       
@@ -68,11 +97,11 @@ document.addEventListener('DOMContentLoaded', () => {
       // Check if URL has a hash to load specific story
       handleHashChange();
       
-      // Hide loading text and update count
+      // Update counts
       updateStoryCount();
     })
     .catch(error => {
-      console.error('Error fetching stories:', error);
+      console.error('Error combining stories:', error);
       storyCount.textContent = 'Yazılar yüklenemedi.';
     });
 
@@ -226,7 +255,10 @@ function applyFilters() {
     // Tag filter
     const matchesTag = !activeTag || story.normalizedTags.includes(activeTag);
 
-    return matchesSearch && matchesTag;
+    // Source tab filter
+    const matchesSource = activeSourceFilter === 'all' || story.source === activeSourceFilter;
+
+    return matchesSearch && matchesTag && matchesSource;
   });
 
   renderStoryList();
@@ -273,10 +305,16 @@ function renderStoryList() {
     // Get a brief snippet of content
     const previewText = story.content.replace(/\n+/g, ' ').substring(0, 100);
 
+    // Badge styling
+    const badgeHtml = story.source === 'ekmekvegul' 
+      ? `<span class="source-badge ekmekvegul">Ekmek ve Gül</span>`
+      : `<span class="source-badge defter">Az Pişmiş</span>`;
+
     item.innerHTML = `
       <div class="story-item-meta">
         <span>${displayDate}</span>
-        <span>☕ ${readingTime} dk okuma</span>
+        ${badgeHtml}
+        <span>☕ ${readingTime} dk</span>
       </div>
       <h2 class="story-item-title">${story.title}</h2>
       <p class="story-item-preview">${previewText}...</p>
@@ -434,6 +472,16 @@ function renderStory(storyId) {
       ${paragraphs}
     </article>
 
+    ${story.link ? `
+      <div class="story-original-link">
+        <span>Bu yazı ilk olarak <strong>Ekmek ve Gül</strong> platformunda yayınlanmıştır.</span>
+        <a href="${story.link}" target="_blank" rel="noopener noreferrer" class="original-link-btn">
+          Orijinal Yazıyı Oku
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 4px; vertical-align: middle;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" x2="21" y1="14" y2="3"></line></svg>
+        </a>
+      </div>
+    ` : ''}
+
     ${paginationHtml}
   `;
 
@@ -503,6 +551,28 @@ function handleHashChange() {
 }
 
 function setupEventListeners() {
+  // Source Filter Tab Listeners
+  const sourceTabs = [
+    { el: tabAll, val: 'all' },
+    { el: tabDefter, val: 'defter' },
+    { el: tabEkmekveGul, val: 'ekmekvegul' }
+  ];
+
+  sourceTabs.forEach(tab => {
+    if (tab.el) {
+      tab.el.addEventListener('click', () => {
+        activeSourceFilter = tab.val;
+        
+        // Toggle active styling
+        sourceTabs.forEach(t => {
+          if (t.el) t.el.classList.toggle('active', t.val === tab.val);
+        });
+        
+        applyFilters();
+      });
+    }
+  });
+
   // Hash Routing
   window.addEventListener('hashchange', handleHashChange);
 

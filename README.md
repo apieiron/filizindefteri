@@ -47,13 +47,18 @@ Sitedeki tüm hikayeler [stories.json](stories.json) dosyasında saklanmaktadır
       "Az",
       "Pişmiş",
       "aile",
-      "hayatı",
-      "yeni",
-      "yazı"
+      "hayatı"
     ],
-    "content": "Hikaye veya deneme metniniz buraya gelecektir.\nParagraf geçişleri için yeni satır karakterlerini kullanabilirsiniz.\nÇift tırnak kullanmanız gereken yerlerde kaçış karakteri (\\\"örnek\\\") kullanmayı unutmayın."
+    "content": "Hikaye veya deneme metniniz buraya gelecektir.\nParagraf geçişleri için yeni satır karakterlerini kullanabilirsiniz.\nÇift tırnak kullanmanız gereken yerlerde kaçış karakteri (\\\"örnek\\\") kullanmayı unutmayın.",
+    "visible": 1
   }
 ```
+
+> [!TIP]
+> **Görünürlük (visible) Ayarı:**
+> * JSON dosyasındaki her yazı için en sonda `"visible": 1` alanı yer alır.
+> * Bir yazının listede görünmesini istemiyorsanız bu değeri `0` yapmanız yeterlidir. Yazı dosyadan silinmez fakat sitede listelenmez ve geçiş düğmelerinde atlanır.
+> * Belirtilmezse (varsayılan olarak) veya `1` yapılırsa yazı listede görünür.
 
 > [!TIP]
 > **Etiketler (Tags) Hakkında:**
