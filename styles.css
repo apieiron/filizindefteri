@@ -267,6 +267,15 @@ body {
   color: #fff !important;
 }
 
+.story-list-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 18px 20px 6px 20px;
+}
+
 /* Story list items container */
 .story-list {
   flex-grow: 1;
