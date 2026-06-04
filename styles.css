@@ -854,23 +854,26 @@ body {
    9. SPOTIFY PODCAST & SHARE SYSTEM
    ========================================================================== */
 
-/* Podcast Sidebar Section */
-.podcast-sidebar-section {
+/* External Links & Highlights Section (Sidebar) */
+.external-links-section {
   padding: 18px 20px;
   border-bottom: 1px solid var(--border-color);
-  background-color: rgba(29, 185, 84, 0.03); /* very soft Spotify green tint */
+  background-color: rgba(192, 92, 60, 0.01); /* very subtle brand tint */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.podcast-section-title {
+.external-section-title {
   font-size: 11px;
   font-weight: 700;
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  margin-bottom: 10px;
+  margin-bottom: 4px;
 }
 
-.podcast-card {
+.external-card {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -882,14 +885,22 @@ body {
   transition: var(--transition-smooth);
 }
 
-.podcast-card:hover {
-  border-color: #1ed760; /* Spotify Green */
-  box-shadow: 0 4px 12px rgba(29, 185, 84, 0.08);
+.external-card:hover {
   transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
-.podcast-icon-wrapper {
-  background-color: #1db954; /* Spotify green */
+.external-card.spotify:hover {
+  border-color: #1ed760; /* Spotify Green */
+  box-shadow: 0 4px 12px rgba(29, 185, 84, 0.08);
+}
+
+.external-card.ekmekvegul:hover {
+  border-color: var(--primary-color); /* Brand Red */
+  box-shadow: 0 4px 12px rgba(192, 92, 60, 0.08);
+}
+
+.external-icon-wrapper {
   color: #fff;
   width: 32px;
   height: 32px;
@@ -898,36 +909,54 @@ body {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: var(--transition-smooth);
 }
 
-.podcast-info {
+.external-icon-wrapper.spotify {
+  background-color: #1db954;
+}
+
+.external-icon-wrapper.ekmekvegul {
+  background-color: var(--primary-color);
+}
+
+.external-info {
   display: flex;
   flex-direction: column;
 }
 
-.podcast-show-title {
+.external-card-title {
   font-size: 12px;
   font-weight: 600;
   color: var(--text-primary);
   line-height: 1.3;
 }
 
-.podcast-platform {
+.external-card-subtitle {
   font-size: 10px;
-  color: #1db954;
-  font-weight: 600;
+  color: var(--text-secondary);
+  font-weight: 500;
   margin-top: 1px;
+  transition: var(--transition-smooth);
 }
 
-/* Welcome Screen Podcast Section */
-.welcome-podcast-section {
+.external-card.spotify:hover .external-card-subtitle {
+  color: #1db954;
+}
+
+.external-card.ekmekvegul:hover .external-card-subtitle {
+  color: var(--primary-color);
+}
+
+/* Welcome Screen Podcast & Ekmek ve Gül Sections */
+.welcome-podcast-section, .welcome-ekmekvegul-section {
   margin-top: 40px;
   width: 100%;
   border-top: 1px solid var(--border-color);
   padding-top: 30px;
 }
 
-.welcome-podcast-title {
+.welcome-podcast-title, .welcome-ekmekvegul-title {
   font-family: var(--font-display);
   font-size: 18px;
   font-weight: 700;
@@ -942,6 +971,32 @@ body {
   overflow: hidden;
   box-shadow: var(--shadow-sm);
   background-color: transparent;
+}
+
+/* Ekmek ve Gül Welcome Button */
+.ekmekvegul-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--primary-color);
+  color: #fff !important;
+  border: none;
+  padding: 12px 24px;
+  border-radius: var(--border-radius-sm);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: var(--transition-smooth);
+  box-shadow: var(--shadow-sm);
+  margin-top: 10px;
+}
+
+.ekmekvegul-btn:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 /* Share Buttons Styling */
